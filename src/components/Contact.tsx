@@ -71,16 +71,13 @@ const Contact = () => {
                 }}
             >
                 <span>
-                    <a
-                        href="mailto:cantrelatejp@gmail.com"
-                        style={{ width: "300px" }}
-                    >
+                    <a href="mailto:gamil@gmail.com" style={{ width: "300px" }}>
                         <h6 className="bold">
                             <FaEnvelope
                                 style={{ marginRight: "5px", fontSize: "20px" }}
                                 className="left black-text"
                             />
-                            Cantrelatejp@gmail.com
+                            gamil@gmail.com
                         </h6>
                     </a>
                 </span>
@@ -94,13 +91,13 @@ const Contact = () => {
                 }}
             >
                 <span>
-                    <a href="https://www.instagram.com/cantrelate.jp/">
+                    <a href="https://www.instagram.com">
                         <h6 className="bold">
                             <FaInstagram
                                 style={{ marginRight: "5px", fontSize: "20px" }}
                                 className="left black-text"
                             />
-                            @CantRelate.jp
+                            @Instagram
                         </h6>
                     </a>
                 </span>
