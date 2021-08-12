@@ -15,6 +15,7 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  getShippingCost: Scalars['String'];
   getUsersOrders: Array<GetOrdersResponse>;
   getOrders: Array<GetOrdersResponse>;
   getOrderById: GetOrdersResponse;
@@ -34,6 +35,13 @@ export type Query = {
   getProductsSections: Array<SectionsOrNull>;
   getSectionsProducts: Array<ProductsWithImages>;
   getProductsOptions: Array<Options>;
+  getProductShipping: Array<Shipping>;
+};
+
+
+export type QueryGetShippingCostArgs = {
+  products: Scalars['String'];
+  US_ORDER: Scalars['Boolean'];
 };
 
 
@@ -78,6 +86,11 @@ export type QueryGetSectionsProductsArgs = {
 
 
 export type QueryGetProductsOptionsArgs = {
+  product_id: Scalars['Float'];
+};
+
+
+export type QueryGetProductShippingArgs = {
   product_id: Scalars['Float'];
 };
 
@@ -201,11 +214,18 @@ export type SectionsOrNull = {
   thumbnail?: Maybe<Scalars['String']>;
 };
 
+export type Shipping = {
+  __typename?: 'Shipping';
+  shipping_id: Scalars['Int'];
+  country: Scalars['String'];
+  price: Scalars['Float'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   editTracking: Scalars['Boolean'];
   paypalCheckout: Scalars['String'];
-  addPaypalOrder: Scalars['Boolean'];
+  addPaypalOrder: Scalars['String'];
   checkout: Scalars['String'];
   toggleProductDisplay: Scalars['Boolean'];
   addProduct: Scalars['String'];
@@ -236,6 +256,8 @@ export type Mutation = {
   addOptionToProduct: Scalars['Boolean'];
   updateOptions: Scalars['Boolean'];
   deleteOptions: Scalars['Boolean'];
+  addShippingToProduct: Scalars['Boolean'];
+  deleteShippingFromProduct: Scalars['Boolean'];
 };
 
 
@@ -246,12 +268,14 @@ export type MutationEditTrackingArgs = {
 
 
 export type MutationPaypalCheckoutArgs = {
+  US_ORDER: Scalars['Boolean'];
   coupon: Scalars['String'];
   products: Scalars['String'];
 };
 
 
 export type MutationAddPaypalOrderArgs = {
+  US_ORDER: Scalars['Boolean'];
   purchase_units: Scalars['String'];
   products: Scalars['String'];
   coupon: Scalars['String'];
@@ -423,6 +447,17 @@ export type MutationDeleteOptionsArgs = {
   options_str: Scalars['String'];
 };
 
+
+export type MutationAddShippingToProductArgs = {
+  shipping_str: Scalars['String'];
+  product_id: Scalars['Float'];
+};
+
+
+export type MutationDeleteShippingFromProductArgs = {
+  shipping_str: Scalars['String'];
+};
+
 export type AuthResponse = {
   __typename?: 'AuthResponse';
   accessToken?: Maybe<Scalars['String']>;
@@ -433,6 +468,7 @@ export type AddPaypalOrderMutationVariables = Exact<{
   user_id: Scalars['String'];
   coupon: Scalars['String'];
   products: Scalars['String'];
+  US_ORDER: Scalars['Boolean'];
   purchase_units: Scalars['String'];
 }>;
 
@@ -593,6 +629,17 @@ export type GetSectionsProductsQuery = (
   )> }
 );
 
+export type GetShippingCostQueryVariables = Exact<{
+  US_ORDER: Scalars['Boolean'];
+  products: Scalars['String'];
+}>;
+
+
+export type GetShippingCostQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'getShippingCost'>
+);
+
 export type GetSocialsQueryVariables = Exact<{
   component: Scalars['String'];
 }>;
@@ -656,6 +703,7 @@ export type MaintenanceLoginMutation = (
 export type PaypalCheckoutMutationVariables = Exact<{
   products: Scalars['String'];
   coupon: Scalars['String'];
+  US_ORDER: Scalars['Boolean'];
 }>;
 
 
@@ -676,12 +724,13 @@ export type ValidateCouponMutation = (
 
 
 export const AddPaypalOrderDocument = gql`
-    mutation addPaypalOrder($user_id: String!, $coupon: String!, $products: String!, $purchase_units: String!) {
+    mutation addPaypalOrder($user_id: String!, $coupon: String!, $products: String!, $US_ORDER: Boolean!, $purchase_units: String!) {
   addPaypalOrder(
     user_id: $user_id
     coupon: $coupon
     products: $products
     purchase_units: $purchase_units
+    US_ORDER: $US_ORDER
   )
 }
     `;
@@ -703,6 +752,7 @@ export type AddPaypalOrderMutationFn = Apollo.MutationFunction<AddPaypalOrderMut
  *      user_id: // value for 'user_id'
  *      coupon: // value for 'coupon'
  *      products: // value for 'products'
+ *      US_ORDER: // value for 'US_ORDER'
  *      purchase_units: // value for 'purchase_units'
  *   },
  * });
@@ -1136,6 +1186,38 @@ export function useGetSectionsProductsLazyQuery(baseOptions?: Apollo.LazyQueryHo
 export type GetSectionsProductsQueryHookResult = ReturnType<typeof useGetSectionsProductsQuery>;
 export type GetSectionsProductsLazyQueryHookResult = ReturnType<typeof useGetSectionsProductsLazyQuery>;
 export type GetSectionsProductsQueryResult = Apollo.QueryResult<GetSectionsProductsQuery, GetSectionsProductsQueryVariables>;
+export const GetShippingCostDocument = gql`
+    query getShippingCost($US_ORDER: Boolean!, $products: String!) {
+  getShippingCost(US_ORDER: $US_ORDER, products: $products)
+}
+    `;
+
+/**
+ * __useGetShippingCostQuery__
+ *
+ * To run a query within a React component, call `useGetShippingCostQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetShippingCostQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetShippingCostQuery({
+ *   variables: {
+ *      US_ORDER: // value for 'US_ORDER'
+ *      products: // value for 'products'
+ *   },
+ * });
+ */
+export function useGetShippingCostQuery(baseOptions: Apollo.QueryHookOptions<GetShippingCostQuery, GetShippingCostQueryVariables>) {
+        return Apollo.useQuery<GetShippingCostQuery, GetShippingCostQueryVariables>(GetShippingCostDocument, baseOptions);
+      }
+export function useGetShippingCostLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetShippingCostQuery, GetShippingCostQueryVariables>) {
+          return Apollo.useLazyQuery<GetShippingCostQuery, GetShippingCostQueryVariables>(GetShippingCostDocument, baseOptions);
+        }
+export type GetShippingCostQueryHookResult = ReturnType<typeof useGetShippingCostQuery>;
+export type GetShippingCostLazyQueryHookResult = ReturnType<typeof useGetShippingCostLazyQuery>;
+export type GetShippingCostQueryResult = Apollo.QueryResult<GetShippingCostQuery, GetShippingCostQueryVariables>;
 export const GetSocialsDocument = gql`
     query getSocials($component: String!) {
   getSocials(component: $component) {
@@ -1295,8 +1377,8 @@ export type MaintenanceLoginMutationHookResult = ReturnType<typeof useMaintenanc
 export type MaintenanceLoginMutationResult = Apollo.MutationResult<MaintenanceLoginMutation>;
 export type MaintenanceLoginMutationOptions = Apollo.BaseMutationOptions<MaintenanceLoginMutation, MaintenanceLoginMutationVariables>;
 export const PaypalCheckoutDocument = gql`
-    mutation paypalCheckout($products: String!, $coupon: String!) {
-  paypalCheckout(products: $products, coupon: $coupon)
+    mutation paypalCheckout($products: String!, $coupon: String!, $US_ORDER: Boolean!) {
+  paypalCheckout(products: $products, coupon: $coupon, US_ORDER: $US_ORDER)
 }
     `;
 export type PaypalCheckoutMutationFn = Apollo.MutationFunction<PaypalCheckoutMutation, PaypalCheckoutMutationVariables>;
@@ -1316,6 +1398,7 @@ export type PaypalCheckoutMutationFn = Apollo.MutationFunction<PaypalCheckoutMut
  *   variables: {
  *      products: // value for 'products'
  *      coupon: // value for 'coupon'
+ *      US_ORDER: // value for 'US_ORDER'
  *   },
  * });
  */

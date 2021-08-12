@@ -150,8 +150,6 @@ const UsersOrders = () => {
         return <></>;
     }
 
-    console.log("data :>> ", data);
-
     let sortedOrders: [UserOrders] = sortByProp(
         data.getUsersOrders,
         "order_id",

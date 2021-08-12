@@ -21,6 +21,20 @@
     font-weight: 550;
 }
 
+.checkout-btn {
+    margin-top: 16px;
+    width: 45%;
+    max-width: 380px;
+    background-color: #0a0a0a;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &:hover {
+        background-color: #0a0a0a;
+    }
+}
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

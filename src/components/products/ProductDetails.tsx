@@ -71,6 +71,12 @@ const ProductDetails = () => {
 
             elems = document.querySelectorAll(".dropdown-trigger");
             M.Dropdown.init(elems);
+            if (!!data && !!document.getElementById("product-desc")) {
+                document.getElementById("product-desc")!.innerHTML =
+                    data.getProduct.desc;
+                document.getElementById("product-desc-m")!.innerHTML =
+                    data.getProduct.desc;
+            }
             // (stock * 100)/ org_stock
             let percent = 50;
             if (!data || !data!.getProduct.org_stock) {
@@ -91,11 +97,11 @@ const ProductDetails = () => {
                 }
             }
 
-            // anime({
-            //     targets: ".filler",
-            //     width: ["0%", `${percent}%`],
-            //     easing: "easeInOutExpo",
-            // });
+            anime({
+                targets: ".filler",
+                width: ["0%", `${percent}%`],
+                easing: "easeInOutExpo",
+            });
 
             if (!document.getElementById("product-img")) {
             } else {
@@ -115,11 +121,7 @@ const ProductDetails = () => {
         return <Redirect to="/products" />;
     }
 
-    console.log("odata :>> ", odata);
-
     let product: any = data!.getProduct;
-
-    console.log("product :>> ", product);
 
     // setTimeout(() => {
     //     var instance = M.Carousel.getInstance(
@@ -132,13 +134,32 @@ const ProductDetails = () => {
         <div>
             <h3 className="center-align">{product.name}</h3>
             <h6 className="center-align">
-                ${Number(product.price / 100).toFixed(2)}{" "}
                 {product.stock === 0 ? (
                     <span style={{ color: "#ff0000", fontWeight: "bold" }}>
                         SOLD OUT
                     </span>
                 ) : (
-                    <></>
+                    <>
+                        {odata.getProductsOptions.length === 0 ? (
+                            <>${Number(product.price / 100).toFixed(2)} </>
+                        ) : (
+                            <>
+                                {option.option_price ? (
+                                    <span
+                                        className="option-price-id"
+                                        id="option-price-id"
+                                    >
+                                        $
+                                        {Number(
+                                            option.option_price / 100
+                                        ).toFixed(2)}{" "}
+                                    </span>
+                                ) : (
+                                    <span style={{ opacity: 0 }}>$0.00</span>
+                                )}
+                            </>
+                        )}
+                    </>
                 )}
             </h6>
 
@@ -172,7 +193,7 @@ const ProductDetails = () => {
                                                                 maxHeight:
                                                                     "350px",
                                                                 height: "100%",
-                                                                width: "10%",
+                                                                width: "12.5%",
                                                             }}
                                                             onClick={() => {
                                                                 var instance = M.Carousel.getInstance(
@@ -189,7 +210,7 @@ const ProductDetails = () => {
                                                             style={{
                                                                 maxHeight:
                                                                     "350px",
-                                                                width: "80%",
+                                                                width: "75%",
                                                             }}
                                                             src={
                                                                 product.images[
@@ -252,7 +273,7 @@ const ProductDetails = () => {
                                                                 maxHeight:
                                                                     "250px",
                                                                 height: "100%",
-                                                                width: "10%",
+                                                                width: "12.5%",
                                                             }}
                                                             onClick={() => {
                                                                 var instance = M.Carousel.getInstance(
@@ -307,7 +328,11 @@ const ProductDetails = () => {
                             <div>
                                 <img
                                     id="product-img"
-                                    src={product.images[0].img_url || ""}
+                                    src={
+                                        !product.images[0]
+                                            ? "https://materializecss.com/images/sample-1.jpg"
+                                            : product.images[0].img_url
+                                    }
                                     alt="product"
                                     style={{ maxWidth: "100%" }}
                                 />
@@ -319,16 +344,14 @@ const ProductDetails = () => {
                     <div
                         style={{ marginBottom: "16px" }}
                         className="hide-on-small-only"
-                    >
-                        {product.desc}
-                    </div>
+                        id="product-desc"
+                    ></div>
                     <div className="centered">
                         <div
                             style={{ marginBottom: "16px", marginTop: "16px" }}
                             className="show-on-small hide-on-med-and-up"
-                        >
-                            {product.desc}
-                        </div>
+                            id="product-desc-m"
+                        ></div>
                     </div>
                     <div
                         className="divider"
@@ -469,7 +492,6 @@ const ProductDetails = () => {
                                     <li
                                         key={i}
                                         onClick={() => {
-                                            console.log("clicked");
                                             let percent = 100;
 
                                             percent =
@@ -500,6 +522,7 @@ const ProductDetails = () => {
                                                     odata.getProductsOptions[i]
                                                         .stock,
                                             });
+
                                             document
                                                 .getElementById("add-cart-btn")!
                                                 .classList.remove("disabled");

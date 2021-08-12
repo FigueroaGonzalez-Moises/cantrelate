@@ -34,9 +34,12 @@ export interface State {
 const loadState = () => {
     try {
         let serializedState = localStorage.getItem("store-state");
-        if (serializedState) {
+        if (!serializedState) {
+            let state = JSON.stringify([]);
+            localStorage.setItem("store-state", state);
+            return [];
+        } else {
             let state = JSON.parse(serializedState);
-            console.log("state :>> ", state);
             return state;
         }
     } catch (err) {
@@ -58,10 +61,7 @@ type Actions = {
 export const RootReducer = (state = initState, action: Actions) => {
     switch (action.type) {
         case "ADD_PRODUCT_TO_CART": {
-            debugger;
             let products = loadState().productsInCart || [];
-            console.log("products :>> ", products);
-            console.log("action :>> ", action);
 
             //if product is already in cart increase quantity instead of adding a new product
             for (let i = 0; i < products.length; i++) {

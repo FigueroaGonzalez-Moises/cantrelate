@@ -30,7 +30,7 @@ const Navbar = () => {
 
     const { signIn } = useGoogleLogin({
         clientId:
-            "767129492168-gloagc4m640fgeegm6if58heehkpup7d.apps.googleusercontent.com",
+            "36358700157-4ihpf9tj4bjf4k346b8pnubt4meim4j0.apps.googleusercontent.com",
         onSuccess: handler,
     });
 

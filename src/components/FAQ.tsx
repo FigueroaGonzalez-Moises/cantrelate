@@ -44,8 +44,9 @@ const FAQ = () => {
                         <strong style={{ fontWeight: 550 }}>
                             CantRelate.JP
                         </strong>{" "}
-                        is not responsible for lost or damaged items but will
-                        replace when possible.
+                        is not responsible for lost or damaged items, if your
+                        items have been lost or damaged. Please{" "}
+                        <a href="#/contact"> contact us </a> .
                     </p>
 
                     <div className="divider"></div>

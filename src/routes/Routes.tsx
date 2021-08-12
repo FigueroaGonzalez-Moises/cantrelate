@@ -14,7 +14,7 @@ import ViewSection from "../components/Sections/ViewSection";
 
 export const Routes = () => {
     const stripePromise = loadStripe(
-        "pk_test_51IM63dFngR9vHhwSep5ZkKLLach7ZP7BXFkDjSgo6FmQRdy8DOkV96RdHREb1L4vMgQ1fK6FlNfwDdlFX8zKdf1D00wHpHGbCC"
+        "pk_live_51IM63dFngR9vHhwSqY8SvxV2Ze2X07flq8R1TIEIzkXKRzmqPMMzU9Sz0b9crdxdY0NaTjqtkcP9gBf4lebXaX5R00uzQ5fPYw"
     );
 
     return (

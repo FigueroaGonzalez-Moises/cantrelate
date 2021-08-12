@@ -1,0 +1,3 @@
+query getShippingCost($US_ORDER: Boolean!, $products: String!) {
+    getShippingCost(US_ORDER: $US_ORDER, products: $products)
+}

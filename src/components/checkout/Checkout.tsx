@@ -6,6 +6,7 @@ import {
     useValidateCouponMutation,
     usePaypalCheckoutMutation,
     useAddPaypalOrderMutation,
+    useGetShippingCostQuery,
 } from "../../generated/graphql";
 import { CardElement } from "@stripe/react-stripe-js";
 import { Redirect } from "react-router";
@@ -43,12 +44,22 @@ function CardSection() {
 
 const Checkout = props => {
     const { data } = useGetCurrUserQuery();
+    const products = useSelector(state => state.productsInCart);
+
+    const products_str = JSON.stringify(products);
+
+    const sh_res = useGetShippingCostQuery({
+        variables: {
+            US_ORDER: true,
+            products: products_str,
+        },
+    });
+
     const [checkout] = useCheckoutMutation();
     const [validateCoupon] = useValidateCouponMutation();
     const [paypalCheckout] = usePaypalCheckoutMutation();
     const [addPaypalOrder] = useAddPaypalOrderMutation();
     const [discountPH, setDiscountPH] = useState(0);
-    const products = useSelector(state => state.productsInCart);
     const dispatch = useDispatch();
     const [coupon, setCoupon] = useState("");
     const [subtotal, setSubtotal] = useState(-1);
@@ -69,6 +80,7 @@ const Checkout = props => {
 
     const [paidFor, setPaidFor] = useState(false);
     const [err, setError] = useState("");
+    const [US_ORDER, SET_US_ORDER] = useState(true);
     const [address, setAddress] = useState({
         city: "",
         line1: "",
@@ -141,6 +153,9 @@ const Checkout = props => {
             },
         });
 
+        if (sh_res.data && !sh_res.loading) {
+            setShipping(Number(sh_res.data.getShippingCost));
+        }
         let win = window as any;
         try {
             if (!!tmp && tmp.children.length === 0) {
@@ -153,6 +168,7 @@ const Checkout = props => {
                                 variables: {
                                     products: products_str,
                                     coupon: couponRef.current || "NONE",
+                                    US_ORDER,
                                 },
                             });
 
@@ -179,7 +195,6 @@ const Checkout = props => {
                         },
                         onApprove: async (_ppdata, actions) => {
                             const order = await actions.order.capture();
-                            console.log("order :>> ", order);
                             let products_str = JSON.stringify(products),
                                 purchaseUnits_str = JSON.stringify(
                                     order.purchase_units
@@ -202,6 +217,7 @@ const Checkout = props => {
                                     products: products_str,
                                     purchase_units: purchaseUnits_str,
                                     user_id,
+                                    US_ORDER,
                                 },
                             });
                             setPaidFor(true);
@@ -213,6 +229,7 @@ const Checkout = props => {
                                 variables: {
                                     products: products_str,
                                     coupon,
+                                    US_ORDER,
                                 },
                             });
                             setError(price.data.paypalCheckout);
@@ -225,6 +242,10 @@ const Checkout = props => {
             setError("DONT_KNOW");
         }
     }, [Total, addPaypalOrder, coupon, data, paypalCheckout, products]);
+
+    if (sh_res.loading) {
+        return <> </>;
+    }
 
     if (!!err) {
         return (
@@ -321,16 +342,17 @@ const Checkout = props => {
             if (!response!.data!.checkout) {
                 M.toast({ html: "Failed to checkout" });
                 M.toast({ html: "Please double check your details" });
-            } else if (response!.data!.checkout) {
+            } else if (response!.data!.checkout === "true") {
                 setPaidFor(true);
+            } else {
+                setError(response.data!.checkout);
             }
         }
         payBtn.classList.remove("disabled");
     };
 
     if (subtotal === -1) {
-        let tmp_subtotal = 0,
-            shipping_total = 100;
+        let tmp_subtotal = 0;
 
         for (let i = 0; i < products.length; i++) {
             let product = products[i];
@@ -339,12 +361,6 @@ const Checkout = props => {
             } else {
                 tmp_subtotal += products[i].option_price * products[i].quantity;
             }
-
-            shipping_total += products[i].quantity * 50;
-        }
-
-        if (shipping_total > 500) {
-            shipping_total = 500;
         }
 
         let tax = Math.round(tmp_subtotal * 0.095);
@@ -352,7 +368,6 @@ const Checkout = props => {
         // shipping not added to subtotal bc it isn't rerendered if a coupon is added
         setTotal(tmp_subtotal + tax);
         setSubtotal(tmp_subtotal);
-        setShipping(shipping_total);
     }
 
     const validateForm = () => {
@@ -450,10 +465,7 @@ const Checkout = props => {
 
     return (
         <div className="row" style={{ height: "100%", margin: "0" }}>
-            <div
-                className="col s12 m6  z-depth-3 "
-                style={{ minHeight: "93vh", paddingBottom: 32 }}
-            >
+            <div className="col s12 m6">
                 <div className="container" style={{ marginTop: "50px" }}>
                     <div className="row">
                         <a href="#/my-cart">
@@ -643,7 +655,7 @@ const Checkout = props => {
                                             <button
                                                 className="btn"
                                                 style={{
-                                                    backgroundColor: "#343145",
+                                                    backgroundColor: "#0a0a0a",
                                                     marginTop: "25px",
                                                     marginBottom: "15px",
                                                 }}
@@ -682,9 +694,6 @@ const Checkout = props => {
                                                                 .validateCoupon ===
                                                             "FREE_SHIPPING"
                                                         ) {
-                                                            console.log(
-                                                                "freesh"
-                                                            );
                                                             // Handle Free Shipping here
                                                             setShipping(0);
                                                             document.getElementById(
@@ -793,6 +802,22 @@ const Checkout = props => {
                                     </span>
                                 </span>
                             </div>
+                            <div className="row">
+                                <div className="centered">
+                                    <p
+                                        onClick={() => {
+                                            SET_US_ORDER(false);
+                                        }}
+                                    >
+                                        <label>
+                                            <input type="checkbox" />
+                                            <span>
+                                                This is an international Order
+                                            </span>
+                                        </label>
+                                    </p>
+                                </div>
+                            </div>
                             <div
                                 style={{
                                     display: "flex",
@@ -812,7 +837,7 @@ const Checkout = props => {
                     </div>
                 </div>
             </div>
-            <div className="col s12 m6" style={{ minHeight: "93vh" }}>
+            <div className="col s12 m6 z-depth-3" style={{ minHeight: "97vh" }}>
                 <div className="container " style={{}}>
                     {/* <div style={{ display: "flex", justifyContent: "center" }}>
                         <h5>Or</h5>
@@ -1149,7 +1174,7 @@ const Checkout = props => {
                                 marginTop: "16px",
                                 marginBottom: "64px",
                                 width: "380px",
-                                backgroundColor: "#343145",
+                                backgroundColor: "#0a0a0a",
                             }}
                             onClick={() => {
                                 validateForm();

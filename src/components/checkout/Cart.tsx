@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetProductsByIdsQuery } from "../../generated/graphql";
-import { changeQuantityOnProduct } from "../../redux/actions/userAction";
+import {
+    changeQuantityOnProduct,
+    resetCart,
+} from "../../redux/actions/userAction";
 import anime from "animejs";
 
 const Cart = () => {
-    const products = useSelector(state => state.productsInCart);
+    const products = useSelector(state => state.productsInCart) || [];
 
     const product_ids = [] as number[];
 
@@ -23,13 +26,13 @@ const Cart = () => {
     }
 
     const products_str = JSON.stringify(product_ids);
+
     const { data, loading, error } = useGetProductsByIdsQuery({
         variables: {
             products_str,
         },
     });
 
-    // const [checkout] = useCheckoutMutation();
     const dispatch = useDispatch();
     const [state, setState] = useState({
         refresh: false,
@@ -70,6 +73,8 @@ const Cart = () => {
     }
 
     if (!!error) {
+        dispatch(resetCart());
+
         return (
             <div style={{ minHeight: "70vh" }}>
                 <div
@@ -174,26 +179,11 @@ const Cart = () => {
                                 }
                             }
                         }
-
-                        // if (products[i].quantity > data.getProducts[j].stock) {
-                        //     // edit the item
-                        //     products[i].name = data.getProducts[j].name;
-                        //     products[i].price = data.getProducts[j].price;
-                        //     products[i].quantity = data.getProducts[j].stock;
-                        //     dispatch(
-                        //         changeQuantityOnProduct(
-                        //             data.getProducts[j].stock,
-                        //             i
-                        //         )
-                        //     );
-                        // }
                     }
                 }
             }
         }
     }
-
-    console.log("products :>> ", products);
 
     return (
         <div style={{ minHeight: "80vh" }}>
@@ -204,6 +194,16 @@ const Cart = () => {
                 <h6 className="center-align" style={{ fontWeight: 600 }}>
                     Subtotal(${Number(total / 100).toFixed(2)})
                 </h6>
+
+                <div className="row container" style={{ marginTop: 20 }}>
+                    <div
+                        style={{
+                            width: "100%",
+                            borderBottom: " 4px solid #980000",
+                        }}
+                    ></div>
+                </div>
+
                 {products.map((_val, i) => {
                     return (
                         <div
@@ -211,14 +211,16 @@ const Cart = () => {
                             key={i}
                             className={`product-${i} product row container`}
                         >
-                            <div className={` col s12 m5 l4`}>
-                                <img
-                                    alt="product"
-                                    src={products[i].images[0].img_url}
-                                    style={{ width: "100%" }}
-                                />
+                            <div className={` col s12 m4 l4`}>
+                                <div className="centered">
+                                    <img
+                                        alt="product"
+                                        src={products[i].images[0].img_url}
+                                        style={{ width: "75%", height: "75%" }}
+                                    />
+                                </div>
                             </div>
-                            <div className="col s12 m4">
+                            <div className="col s12 m3">
                                 <h5 className="center-align hide-on-small-only">
                                     {products[i].name}{" "}
                                     {!products[i].option ? (
@@ -231,26 +233,34 @@ const Cart = () => {
                                 </h5>
 
                                 <h6 className="center-align show-on-small hide-on-med-and-up">
-                                    {products[i].name} ($
-                                    {!products[i].option_price ? (
-                                        <span>
-                                            {Number(
-                                                products[i].price / 100
-                                            ).toFixed(2)}
-                                        </span>
-                                    ) : (
-                                        <span>
-                                            {Number(
-                                                products[i].option_price / 100
-                                            ).toFixed(2)}
-                                        </span>
-                                    )}
-                                    )
+                                    {products[i].name}{" "}
+                                    <span className="bold">
+                                        $
+                                        {!products[i].option_price ? (
+                                            <span>
+                                                {Number(
+                                                    products[i].price / 100
+                                                ).toFixed(2)}
+                                            </span>
+                                        ) : (
+                                            <span>
+                                                {Number(
+                                                    products[i].option_price /
+                                                        100
+                                                ).toFixed(2)}
+                                            </span>
+                                        )}{" "}
+                                        {!products[i].option ? (
+                                            <></>
+                                        ) : (
+                                            <>({products[i].option})</>
+                                        )}
+                                    </span>
                                 </h6>
                             </div>
 
                             <div
-                                className="col s4 offset-s4 m2 l2"
+                                className="col s4 offset-s4 offset-m1 m2 l2"
                                 style={{
                                     padding: "0",
                                     display: "flex",
@@ -409,7 +419,7 @@ const Cart = () => {
                                 />
                             </div>
 
-                            <div className="col hide-on-small-only m1 l2">
+                            <div className="col hide-on-small-only m1 l2 bold">
                                 $
                                 {!products[i].option_price ? (
                                     <span>
@@ -436,16 +446,7 @@ const Cart = () => {
                         marginBottom: "40px",
                     }}
                 >
-                    <a
-                        className="btn"
-                        style={{
-                            marginTop: "16px",
-                            width: "45%",
-                            maxWidth: "380px",
-                            backgroundColor: "#343145",
-                        }}
-                        href="#/checkout"
-                    >
+                    <a className="btn checkout-btn" href="#/checkout">
                         checkout
                     </a>
                 </div>

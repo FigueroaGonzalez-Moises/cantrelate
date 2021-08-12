@@ -1,3 +1,7 @@
-mutation paypalCheckout($products: String!, $coupon: String!) {
-    paypalCheckout(products: $products, coupon: $coupon)
+mutation paypalCheckout(
+    $products: String!
+    $coupon: String!
+    $US_ORDER: Boolean!
+) {
+    paypalCheckout(products: $products, coupon: $coupon, US_ORDER: $US_ORDER)
 }

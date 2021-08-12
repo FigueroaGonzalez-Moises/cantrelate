@@ -2,6 +2,7 @@ mutation addPaypalOrder(
     $user_id: String!
     $coupon: String!
     $products: String!
+    $US_ORDER: Boolean!
     $purchase_units: String!
 ) {
     addPaypalOrder(
@@ -9,5 +10,6 @@ mutation addPaypalOrder(
         coupon: $coupon
         products: $products
         purchase_units: $purchase_units
+        US_ORDER: $US_ORDER
     )
 }

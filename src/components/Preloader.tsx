@@ -19,10 +19,6 @@ const reloadAnimation = () => {
 const Preloader = () => {
     const { data, loading } = useGetMaintenanceQuery();
 
-    setTimeout(() => {
-        reloadAnimation();
-    }, 5000);
-
     anime
         .timeline({
             easing: "easeInOutSine",
@@ -97,6 +93,10 @@ const Preloader = () => {
             },
             "-= 500"
         );
+
+    setTimeout(() => {
+        reloadAnimation();
+    }, 3500);
 
     return (
         <div className="loadingWrapper">
